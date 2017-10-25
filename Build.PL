@@ -30,8 +30,8 @@ my $builder = Module::Build::WithXSpp->new(
         'ExtUtils::Typemap::STL::String' => '0.04',
         'ExtUtils::Typemap::Basic'       => '0.04',
     },
-    extra_compiler_flags => [ Alien::Box2D->config('cflags') ],
-    extra_linker_flags   => [ Alien::Box2D->config('libs') ],
+    extra_compiler_flags => [ Alien::Box2D->cflags ],
+    extra_linker_flags   => [ Alien::Box2D->libs ],
     meta_merge => {
         resources => {
             bugtracker => 'https://github.com/PerlGameDev/Box2D-perl/issues',
