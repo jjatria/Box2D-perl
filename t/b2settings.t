@@ -47,7 +47,7 @@ like( $version->major,                       qr/^\d+$/,              "version->m
 like( $version->minor,                       qr/^\d+$/,              "version->minor is a number" );
 like( $version->revision,                    qr/^\d+$/,              "version->revision is a number" );
 isnt( $version,                              Box2D::b2_version(),    "b2_version returns different objects" );
-diag( sprintf("%s.%s.%s", $version->major, $version->minor, $version->revision) );
+diag( sprintf("Version: %s.%s.%s", $version->major, $version->minor, $version->revision) );
 
 pass("cleanup");
 
