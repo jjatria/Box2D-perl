@@ -5,7 +5,9 @@
 
 b2PolygonShape();
 
-int32 GetVertexCount();
+int32 GetChildCount();
+
+bool Validate();
 
 %{
 
@@ -34,16 +36,6 @@ b2PolygonShape::SetAsBox( x, y, ... )
 			croak_xs_usage( cv, "THIS, x, y, ()||(center, angle)" );
 
 void*
-b2PolygonShape::GetVertex( index )
-	int index
-	PREINIT:
-		const char* CLASS = "Box2D::b2Vec2";
-	CODE:
-		RETVAL = new b2Vec2(THIS->GetVertex(index));
-	OUTPUT:
-		RETVAL
-
-void*
 b2PolygonShape::m_centroid( ... )
 	PREINIT:
 		const char* CLASS = "Box2D::b2Vec2";
@@ -55,7 +47,7 @@ b2PolygonShape::m_centroid( ... )
 		RETVAL = &(THIS->m_centroid);
 	OUTPUT:
 		RETVAL
-		
+
 void*
 b2PolygonShape::m_vertices( index, ... )
 	int index;
@@ -69,7 +61,7 @@ b2PolygonShape::m_vertices( index, ... )
 		RETVAL = &(THIS->m_vertices[index]);
 	OUTPUT:
 		RETVAL
-		
+
 void*
 b2PolygonShape::m_normals( index, ... )
 	int index;
@@ -83,18 +75,18 @@ b2PolygonShape::m_normals( index, ... )
 		RETVAL = &(THIS->m_normals[index]);
 	OUTPUT:
 		RETVAL
-		
+
 int32
-b2PolygonShape::m_vertexCount( ... )
+b2PolygonShape::m_count( ... )
 	CODE:
 		if ( items > 1 )
 		{
-			THIS->m_vertexCount = (int32)SvIV( ST(1) );
+			THIS->m_count = (int32)SvIV( ST(1) );
 		}
-		RETVAL = THIS->m_vertexCount;
+		RETVAL = THIS->m_count;
 	OUTPUT:
 		RETVAL
-		
+
 %}
 
 };

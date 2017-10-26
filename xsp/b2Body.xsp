@@ -16,9 +16,9 @@ void SetAngularVelocity( float32 omega );
 
 float32 GetAngularVelocity();
 
-void ApplyTorque( float32 torque );
+void ApplyTorque( float32 torque, bool wake );
 
-void ApplyAngularImpulse( float32 impulse );
+void ApplyAngularImpulse( float32 impulse, bool wake );
 
 float32 GetMass();
 
@@ -57,6 +57,8 @@ bool IsActive();
 void SetFixedRotation( bool flag );
 
 bool IsFixedRotation();
+
+void Dump();
 
 %{
 
@@ -97,7 +99,6 @@ b2Body::SetTransform( position, angle )
 	float32 angle
 	CODE:
 		THIS->SetTransform( *position, angle );
-
 
 void*
 b2Body::GetTransform( )
@@ -151,24 +152,34 @@ b2Body::GetLinearVelocity()
 		RETVAL
 
 void
-b2Body::ApplyForce( force, point )
+b2Body::ApplyForce( force, point, wake )
 	b2Vec2* force
 	b2Vec2* point
+	bool wake
 	CODE:
-		THIS->ApplyForce( *force, *point );
+		THIS->ApplyForce( *force, *point, wake );
 
 void
-b2Body::ApplyForceToCenter( force )
+b2Body::ApplyForceToCenter( force, wake )
 	b2Vec2* force
+	bool wake
 	CODE:
-		THIS->ApplyForceToCenter( *force );
+		THIS->ApplyForceToCenter( *force, wake );
 
 void
-b2Body::ApplyLinearImpulse( impulse, point )
+b2Body::ApplyLinearImpulse( impulse, point, wake )
 	b2Vec2* impulse
 	b2Vec2* point
+	bool wake
 	CODE:
-		THIS->ApplyLinearImpulse( *impulse, *point );
+		THIS->ApplyLinearImpulse( *impulse, *point, wake );
+
+void
+b2Body::ApplyLinearImpulseToCenter( impulse, wake )
+	b2Vec2* impulse
+	bool wake
+	CODE:
+		THIS->ApplyLinearImpulseToCenter( *impulse, wake );
 
 void
 b2Body::GetMassData( data )
@@ -314,11 +325,6 @@ b2Body::GetWorld()
 		RETVAL = THIS->GetWorld();
 	OUTPUT:
 		RETVAL
-
-void
-b2Body::Dump()
-	CODE:
-		THIS->Dump();
 
 %}
 
