@@ -42,8 +42,7 @@ $fixtureDef->shape( $dynamicBox );
 $fixtureDef->density(1.0);
 $fixtureDef->friction(0.01);
 
-
-$body->CreateFixtureDef($fixtureDef);
+$body->CreateFixture($fixtureDef);
 
 my $timeStep = 1.0/60.0;
 my $velocityIterations = 6;

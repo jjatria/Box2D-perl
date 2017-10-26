@@ -245,7 +245,7 @@ sub make_fixture {
     my $fixtureDef = Box2D::b2FixtureDef->new();
     $fixtureDef->shape($shape);
     $fixtureDef->density($density);
-    return $body->CreateFixtureDef($fixtureDef);
+    return $body->CreateFixture($fixtureDef);
 }
 
 # joints
@@ -274,7 +274,7 @@ sub draw_polygon {
     my ($polygon) = @_;
     my ( $body, $shape, $color ) = @$polygon{qw( body shape color )};
     my @verts = map { [ w2s( $_->x ), w2s( $_->y ) ] }
-        map { $body->GetWorldPoint( $shape->GetVertex($_) ) }
-        ( 0 .. $shape->GetVertexCount() - 1 );
+        map { $body->GetWorldPoint( $shape->m_vertices($_) ) }
+        ( 0 .. $shape->m_count - 1 );
     $app->draw_polygon_filled( \@verts, $color );
 }

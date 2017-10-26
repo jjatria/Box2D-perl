@@ -169,8 +169,8 @@ sub draw_polygon {
     my ( $shape, $body, $color ) = @$polygon{qw( shape body color )};
 
     my @verts = map { [ $_->x, $_->y ] }
-        map { $body->GetWorldPoint( $shape->GetVertex($_) ) }
-        ( 0 .. $shape->GetVertexCount() - 1 );
+        map { $body->GetWorldPoint( $shape->m_vertices($_) ) }
+        ( 0 .. $shape->m_count - 1 );
 
     $app->draw_polygon_filled( \@verts, $color );
 }

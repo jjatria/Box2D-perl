@@ -212,7 +212,7 @@ sub make_fixture {
     my $fixtureDef = Box2D::b2FixtureDef->new();
     $fixtureDef->shape($shape);
     $fixtureDef->density($density);
-    return $body->CreateFixtureDef($fixtureDef);
+    return $body->CreateFixture($fixtureDef);
 }
 
 # joints

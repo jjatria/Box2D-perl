@@ -69,7 +69,7 @@ sub makeBody {
     $fixtureDef->restitution( 0.1 + 0.9 * rand() );
 
     # attach fixture to body to give it properties and shape
-    $body->CreateFixtureDef($fixtureDef);
+    $body->CreateFixture($fixtureDef);
 
     # record the body
     push @bodies, $body;

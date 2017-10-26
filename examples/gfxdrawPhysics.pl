@@ -70,7 +70,7 @@ sub makeBody {
     # friction
     $fixtureDef->friction(0.1+0.9*rand());
     # attach fixture to body to give it properties and shape
-    $body->CreateFixtureDef($fixtureDef);
+    $body->CreateFixture($fixtureDef);
     # record the body
      $bodies{ $bodyCount++ } = $body; 
 

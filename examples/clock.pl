@@ -163,7 +163,7 @@ sub make_dynamic_rect {
     # with each other.
     $fixtureDef->filter->groupIndex(-1);
 
-    $body->CreateFixtureDef($fixtureDef);
+    $body->CreateFixture($fixtureDef);
 
     return { body => $body, shape => $rect };
 }
@@ -203,8 +203,8 @@ sub draw_polygon {
 
     my ( $body, $shape, $color ) = @$polygon{qw( body shape color )};
 
-    my @verts = map { $body->GetWorldPoint( $shape->GetVertex($_) ) }
-        ( 0 .. $shape->GetVertexCount() - 1 );
+    my @verts = map { $body->GetWorldPoint( $shape->m_vertices($_) ) }
+        ( 0 .. $shape->m_count - 1 );
 
     my @vx = map { w2s( $_->x ) } @verts;
     my @vy = map { w2s( $_->y ) } @verts;

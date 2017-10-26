@@ -149,7 +149,7 @@ sub _build_piece1 {
     $fixtureDef->density(0.5);
     $fixtureDef->friction(0.5);
     $fixtureDef->restitution(0.5);
-    return $self->body1->CreateFixtureDef($fixtureDef);
+    return $self->body1->CreateFixture($fixtureDef);
 }
 
 sub _build_piece2 {
@@ -159,7 +159,7 @@ sub _build_piece2 {
     $fixtureDef->density(0.5);
     $fixtureDef->friction(0.5);
     $fixtureDef->restitution(0.5);
-    return $self->body1->CreateFixtureDef($fixtureDef);
+    return $self->body1->CreateFixture($fixtureDef);
 }
 
 sub PostSolve {
@@ -192,7 +192,7 @@ sub Break {
     $fixtureDef->density(1.0);
     $fixtureDef->restitution(0.5);
     my $body2 = $self->world->CreateBody($bodyDef);
-    $self->piece2( $body2->CreateFixtureDef($fixtureDef) );
+    $self->piece2( $body2->CreateFixture($fixtureDef) );
 
     my $center1 = $body1->GetWorldCenter();
     my $center2 = $body2->GetWorldCenter();
@@ -338,8 +338,8 @@ sub draw_breakable {
         my ( $body, $shape ) = @$part;
 
         my @verts = map { [ w2s( $_->x ), w2s( $_->y ) ] }
-            map { $body->GetWorldPoint( $shape->GetVertex($_) ) }
-            ( 0 .. $shape->GetVertexCount() - 1 );
+            map { $body->GetWorldPoint( $shape->m_vertices($_) ) }
+            ( 0 .. $shape->m_count - 1 );
 
         $app->draw_polygon_filled( \@verts, $breakable->color );
     }
