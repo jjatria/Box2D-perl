@@ -58,7 +58,7 @@ for ( 1 .. $segments ) {
     $bob->{body}   = make_dynamic_circle( @$bob{qw( x0 y0 radius )} );
     $bob->{anchor} = Box2D::b2Vec2->new( @$bob{qw( x0 y0 )} );
 
-    my $jointDef = Box2D::b2DistanceJointDef->new();
+    my $jointDef = Box2D::b2DistanceJointDef->new;
     $jointDef->Initialize(
         $prev_pivot->{body},   $bob->{body},
         $prev_pivot->{anchor}, $bob->{anchor}
@@ -94,9 +94,9 @@ my $prev_path_pos;
 $app->add_show_handler(
     sub {
         $world->Step( $timestep, $vIters, $pIters );
-        $world->ClearForces();
+        $world->ClearForces;
 
-        my $endpoint = $bobs[$#bobs]{body}->GetPosition();
+        my $endpoint = $bobs[$#bobs]{body}->GetPosition;
         my $current_path_pos
             = [ w2s( $endpoint->x ), w2s( s2w($height) - $endpoint->y ) ];
 
@@ -109,15 +109,15 @@ $app->add_show_handler(
         $bg->blit( $app, [ 0, 0, $width, $height ] );
 
         # draw 1st pendulum
-        my $p1 = $pivot->{body}->GetPosition();
-        my $p2 = $bobs[0]->{body}->GetPosition();
+        my $p1 = $pivot->{body}->GetPosition;
+        my $p2 = $bobs[0]->{body}->GetPosition;
         $app->draw_line( [ w2s( $p1->x ), w2s( s2w($height) - $p1->y ) ],
             [ w2s( $p2->x ), w2s( s2w($height) - $p2->y ) ], $rodColor );
 
         # draw the other pendulums
         for ( 0 .. $#bobs - 1 ) {
-            my $b1 = $bobs[$_]->{body}->GetPosition();
-            my $b2 = $bobs[ $_ + 1 ]->{body}->GetPosition();
+            my $b1 = $bobs[$_]->{body}->GetPosition;
+            my $b2 = $bobs[ $_ + 1 ]->{body}->GetPosition;
             $app->draw_line( [ w2s( $b1->x ), w2s( s2w($height) - $b1->y ) ],
                 [ w2s( $b2->x ), w2s( s2w($height) - $b2->y ) ], $rodColor );
         }
@@ -132,13 +132,13 @@ $app->add_show_handler(
         $app->draw_gfx_text( [ 10, 10 ],
             0xFFFFFFFF, sprintf( "FPS: %0.2f", $realFps ) );
 
-        $app->update();
+        $app->update;
 
         $frames++;
     }
 );
 
-$app->run();
+$app->run;
 
 # screen to world
 sub s2w { return $_[0] * $mpp }
@@ -149,11 +149,11 @@ sub w2s { return $_[0] * $ppm }
 sub make_static_circle {
     my ( $x, $y, $r ) = @_;
 
-    my $bodyDef = Box2D::b2BodyDef->new();
+    my $bodyDef = Box2D::b2BodyDef->new;
     $bodyDef->position->Set( $x, $y );
     my $body = $world->CreateBody($bodyDef);
 
-    my $circle = Box2D::b2CircleShape->new();
+    my $circle = Box2D::b2CircleShape->new;
     $circle->m_radius($r);
 
     return $body;
@@ -162,13 +162,13 @@ sub make_static_circle {
 sub make_dynamic_circle {
     my ( $x, $y, $r ) = @_;
 
-    my $bodyDef = Box2D::b2BodyDef->new();
+    my $bodyDef = Box2D::b2BodyDef->new;
     $bodyDef->type(Box2D::b2_dynamicBody);
 
     $bodyDef->position->Set( $x, $y );
     my $body = $world->CreateBody($bodyDef);
 
-    my $dynamicCircle = Box2D::b2CircleShape->new();
+    my $dynamicCircle = Box2D::b2CircleShape->new;
     $dynamicCircle->m_radius($r);
 
     return $body;
@@ -176,7 +176,7 @@ sub make_dynamic_circle {
 
 sub draw_circle {
     my ($circle) = @_;
-    my $p = $circle->{body}->GetPosition();
+    my $p = $circle->{body}->GetPosition;
     my ( $x, $y ) = ( $p->x, $p->y );
     $y = s2w($height) - $y;
     my ( $r, $c ) = @$circle{qw( radius color )};

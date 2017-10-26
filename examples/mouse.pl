@@ -59,10 +59,10 @@ for ( 1 .. 100 ) {
 }
 
 my $joint = make_mouse_joint(
-    target   => $ball->{body}->GetWorldCenter(),
+    target   => $ball->{body}->GetWorldCenter,
     bodyA    => $ground->{body},
     bodyB    => $ball->{body},
-    maxForce => 1000.0 * $ball->{body}->GetMass(),
+    maxForce => 1000.0 * $ball->{body}->GetMass,
 );
 
 my $app = SDLx::App->new(
@@ -86,7 +86,7 @@ $app->add_event_handler(
 $app->add_show_handler(
     sub {
         $world->Step( $timestep, $vIters, $pIters );
-        $world->ClearForces();
+        $world->ClearForces;
 
         # clear surface
         $app->draw_rect( undef, 0x000000FF );
@@ -94,11 +94,11 @@ $app->add_show_handler(
         draw_circle($_) foreach @balls;
         draw_circle($ball);
 
-        $app->update();
+        $app->update;
     }
 );
 
-$app->run();
+$app->run;
 
 # screen to world
 sub s2w { return $_[0] * $mpp }
@@ -179,14 +179,14 @@ sub make_ball {
 # shapes
 sub make_edge {
     my ( $p1, $p2 ) = @_;
-    my $edge = Box2D::b2EdgeShape->new();
+    my $edge = Box2D::b2EdgeShape->new;
     $edge->Set( make_vec2(@$p1), make_vec2(@$p2) );
     return $edge;
 }
 
 sub make_circle {
     my (%options) = @_;
-    my $circle = Box2D::b2CircleShape->new();
+    my $circle = Box2D::b2CircleShape->new;
     $circle->m_radius( $options{radius} );
     return $circle;
 }
@@ -194,7 +194,7 @@ sub make_circle {
 # bodies
 sub make_body {
     my (%options) = @_;
-    my $bodyDef = Box2D::b2BodyDef->new();
+    my $bodyDef = Box2D::b2BodyDef->new;
     if ( exists $options{x} && exists $options{y} ) {
         my ( $x, $y ) = @options{qw( x y )};
         $bodyDef->position->Set( $x, $y );
@@ -209,7 +209,7 @@ sub make_body {
 sub make_fixture {
     my (%options) = @_;
     my ( $shape, $body, $density ) = @options{qw( shape body density )};
-    my $fixtureDef = Box2D::b2FixtureDef->new();
+    my $fixtureDef = Box2D::b2FixtureDef->new;
     $fixtureDef->shape($shape);
     $fixtureDef->density($density);
     return $body->CreateFixture($fixtureDef);
@@ -218,7 +218,7 @@ sub make_fixture {
 # joints
 sub make_mouse_joint {
     my (%options) = @_;
-    my $jointDef = Box2D::b2MouseJointDef->new();
+    my $jointDef = Box2D::b2MouseJointDef->new;
     $jointDef->bodyA( $options{bodyA} )       if exists $options{bodyA};
     $jointDef->bodyB( $options{bodyB} )       if exists $options{bodyB};
     $jointDef->target( $options{target} )     if exists $options{target};
@@ -235,7 +235,7 @@ sub make_mouse_joint {
 sub draw_circle {
     my ($circle) = @_;
     my ( $body, $shape, $c ) = @$circle{qw( body shape color )};
-    my $p = $body->GetPosition();
+    my $p = $body->GetPosition;
     my ( $x, $y ) = ( $p->x, $p->y );
     my $r = $shape->m_radius;
     $app->draw_circle_filled( [ w2s($x), w2s($y) ], w2s($r), $c );

@@ -112,7 +112,7 @@ sub BUILD {
 
 sub _build_body1 {
     my ($self) = @_;
-    my $bodyDef = Box2D::b2BodyDef->new();
+    my $bodyDef = Box2D::b2BodyDef->new;
     $bodyDef->type(Box2D::b2_dynamicBody);
     $bodyDef->position->Set( $self->x, $self->y );
     $bodyDef->angle( $self->angle );
@@ -122,7 +122,7 @@ sub _build_body1 {
 
 sub _build_shape1 {
     my ($self) = @_;
-    my $shape1 = Box2D::b2PolygonShape->new();
+    my $shape1 = Box2D::b2PolygonShape->new;
     $shape1->SetAsBox(
         $self->w / 4.0,
         $self->h / 2.0,
@@ -133,7 +133,7 @@ sub _build_shape1 {
 
 sub _build_shape2 {
     my ($self) = @_;
-    my $shape2 = Box2D::b2PolygonShape->new();
+    my $shape2 = Box2D::b2PolygonShape->new;
     $shape2->SetAsBox(
         $self->w / 4.0,
         $self->h / 2.0,
@@ -144,7 +144,7 @@ sub _build_shape2 {
 
 sub _build_piece1 {
     my ($self) = @_;
-    my $fixtureDef = Box2D::b2FixtureDef->new();
+    my $fixtureDef = Box2D::b2FixtureDef->new;
     $fixtureDef->shape( $self->shape1 );
     $fixtureDef->density(0.5);
     $fixtureDef->friction(0.5);
@@ -154,7 +154,7 @@ sub _build_piece1 {
 
 sub _build_piece2 {
     my ($self) = @_;
-    my $fixtureDef = Box2D::b2FixtureDef->new();
+    my $fixtureDef = Box2D::b2FixtureDef->new;
     $fixtureDef->shape( $self->shape2 );
     $fixtureDef->density(0.5);
     $fixtureDef->friction(0.5);
@@ -167,8 +167,10 @@ sub PostSolve {
 
     return if $self->broke;
 
-    my $maxImpulse = max( map { $impulse->normalImpulses($_) }
-            ( 0 .. $contact->GetManifold()->pointCount() - 1 ) );
+    my $maxImpulse = max(
+        map { $impulse->normalImpulses($_) }
+        ( 0 .. $contact->GetManifold()->pointCount() - 1 )
+    );
 
     $self->break(1) if $maxImpulse > 1.0;
 }
@@ -177,30 +179,32 @@ sub Break {
     my ($self) = @_;
 
     my $body1  = $self->body1;
-    my $center = $body1->GetWorldCenter();
+    my $center = $body1->GetWorldCenter;
 
     $body1->DestroyFixture( $self->piece2 );
 
-    my $bodyDef = Box2D::b2BodyDef->new();
+    my $bodyDef = Box2D::b2BodyDef->new;
     $bodyDef->type(Box2D::b2_dynamicBody);
-    my $p = $body1->GetPosition();
+    my $p = $body1->GetPosition;
     $bodyDef->position->Set( $p->x, $p->y );
-    $bodyDef->angle( $body1->GetAngle() );
+    $bodyDef->angle( $body1->GetAngle );
 
-    my $fixtureDef = Box2D::b2FixtureDef->new();
+    my $fixtureDef = Box2D::b2FixtureDef->new;
     $fixtureDef->shape( $self->shape2 );
     $fixtureDef->density(1.0);
     $fixtureDef->restitution(0.5);
     my $body2 = $self->world->CreateBody($bodyDef);
     $self->piece2( $body2->CreateFixture($fixtureDef) );
 
-    my $center1 = $body1->GetWorldCenter();
-    my $center2 = $body2->GetWorldCenter();
+    my $center1 = $body1->GetWorldCenter;
+    my $center2 = $body2->GetWorldCenter;
 
-    my $velocity1
-        = Box2D::b2Cross( $self->angularVelocity, $center1 - $center );
-    my $velocity2
-        = Box2D::b2Cross( $self->angularVelocity, $center2 - $center );
+    my $velocity1 = Box2D::b2Cross(
+        $self->angularVelocity, $center1 - $center
+    );
+    my $velocity2 = Box2D::b2Cross(
+        $self->angularVelocity, $center2 - $center
+    );
 
     $body1->SetAngularVelocity( $self->angularVelocity );
     $body1->SetLinearVelocity($velocity1);
@@ -215,7 +219,7 @@ sub Step {
     my ($self) = @_;
 
     if ( $self->break ) {
-        $self->Break();
+        $self->Break;
         $self->broke(1);
         $self->break(0);
     }
@@ -276,17 +280,17 @@ $app->add_event_handler(
 
 $app->add_show_handler(
     sub {
-        $_->Step() foreach @breakables;
+        $_->Step foreach @breakables;
         $world->Step( $timestep, $vIters, $pIters );
         $world->ClearForces();
 
         $app->draw_rect( undef, 0x000000FF );
         draw_breakable($_) foreach @breakables;
-        $app->update();
+        $app->update;
     }
 );
 
-$app->run();
+$app->run;
 
 # screen to world
 sub s2w { return $_[0] * $mpp }
@@ -311,9 +315,9 @@ sub make_breakable {
 }
 
 sub make_ground {
-    my $bodyDef = Box2D::b2BodyDef->new();
+    my $bodyDef = Box2D::b2BodyDef->new;
     my $ground  = $world->CreateBody($bodyDef);
-    my $shape   = Box2D::b2EdgeShape->new();
+    my $shape   = Box2D::b2EdgeShape->new;
 
     $shape->Set(
         Box2D::b2Vec2->new( 0.0,         s2w($height) ),
@@ -329,7 +333,8 @@ sub draw_breakable {
 
     my @parts = (
         [ $breakable->body1, $breakable->shape1 ],
-        [   $breakable->broke ? $breakable->body2 : $breakable->body1,
+        [
+            $breakable->broke ? $breakable->body2 : $breakable->body1,
             $breakable->shape2
         ]
     );
@@ -337,11 +342,11 @@ sub draw_breakable {
     foreach my $part (@parts) {
         my ( $body, $shape ) = @$part;
 
-        my @verts = map { [ w2s( $_->x ), w2s( $_->y ) ] }
+        my @verts =
+            map { [ w2s( $_->x ), w2s( $_->y ) ] }
             map { $body->GetWorldPoint( $shape->m_vertices($_) ) }
             ( 0 .. $shape->m_count - 1 );
 
         $app->draw_polygon_filled( \@verts, $breakable->color );
     }
 }
-

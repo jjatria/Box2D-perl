@@ -59,8 +59,8 @@ my $joint = make_pulley_joint(
     bodyB         => $platformB->{body},
     groundAnchorA => $groundAnchorA,
     groundAnchorB => $groundAnchorB,
-    anchorA       => $platformA->{body}->GetWorldCenter(),
-    anchorB       => $platformB->{body}->GetWorldCenter(),
+    anchorA       => $platformA->{body}->GetWorldCenter,
+    anchorB       => $platformB->{body}->GetWorldCenter,
     ratio         => 1.0,
 );
 
@@ -94,7 +94,7 @@ $app->add_event_handler(
 $app->add_show_handler(
     sub {
         $world->Step( $timestep, $vIters, $pIters );
-        $world->ClearForces();
+        $world->ClearForces;
 
         # clear surface
         $app->draw_rect( undef, 0x000000FF );
@@ -113,11 +113,11 @@ $app->add_show_handler(
 
         draw_circle($_) foreach @balls;
 
-        $app->update();
+        $app->update;
     }
 );
 
-$app->run();
+$app->run;
 
 # screen to world
 sub s2w { return $_[0] * $mpp }
@@ -207,7 +207,7 @@ sub make_ball {
 # shapes
 sub make_edge {
     my ( $p1, $p2 ) = @_;
-    my $edge = Box2D::b2EdgeShape->new();
+    my $edge = Box2D::b2EdgeShape->new;
     $edge->Set( make_vec2(@$p1), make_vec2(@$p2) );
     return $edge;
 }
@@ -215,14 +215,14 @@ sub make_edge {
 sub make_rect {
     my (%options) = @_;
     my ( $width, $height ) = @options{qw( width height )};
-    my $rect = Box2D::b2PolygonShape->new();
+    my $rect = Box2D::b2PolygonShape->new;
     $rect->SetAsBox( $width / 2, $height / 2 );
     return $rect;
 }
 
 sub make_circle {
     my (%options) = @_;
-    my $circle = Box2D::b2CircleShape->new();
+    my $circle = Box2D::b2CircleShape->new;
     $circle->m_radius( $options{radius} );
     return $circle;
 }
@@ -231,7 +231,7 @@ sub make_circle {
 sub make_body {
     my (%options) = @_;
     my ( $x, $y ) = @options{qw( x y )};
-    my $bodyDef = Box2D::b2BodyDef->new();
+    my $bodyDef = Box2D::b2BodyDef->new;
     $bodyDef->position->Set( $x, $y );
     $bodyDef->type(Box2D::b2_dynamicBody)
         if exists $options{type} && $options{type} eq 'dynamic';
@@ -242,7 +242,7 @@ sub make_body {
 sub make_fixture {
     my (%options) = @_;
     my ( $shape, $body, $density ) = @options{qw( shape body density )};
-    my $fixtureDef = Box2D::b2FixtureDef->new();
+    my $fixtureDef = Box2D::b2FixtureDef->new;
     $fixtureDef->shape($shape);
     $fixtureDef->density($density);
     return $body->CreateFixture($fixtureDef);
@@ -251,7 +251,7 @@ sub make_fixture {
 # joints
 sub make_pulley_joint {
     my (%options) = @_;
-    my $jointDef = Box2D::b2PulleyJointDef->new();
+    my $jointDef = Box2D::b2PulleyJointDef->new;
     $jointDef->Initialize(
         @options{
             qw( bodyA bodyB groundAnchorA groundAnchorB anchorA anchorB ratio )
@@ -264,7 +264,7 @@ sub make_pulley_joint {
 sub draw_circle {
     my ($circle) = @_;
     my ( $body, $shape, $c ) = @$circle{qw( body shape color )};
-    my $p = $body->GetPosition();
+    my $p = $body->GetPosition;
     my ( $x, $y ) = ( $p->x, $p->y );
     my $r = $shape->m_radius;
     $app->draw_circle_filled( [ w2s($x), w2s($y) ], w2s($r), $c );

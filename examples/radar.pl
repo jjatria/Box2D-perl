@@ -18,7 +18,7 @@ sub new {
 sub ReportFixture {
     my ( $self, $fixture, $point, $normal, $fraction ) = @_;
 
-    my $id = $fixture->GetUserData();
+    my $id = $fixture->GetUserData;
 
     $self->{objects}->[$id]->{color} = 0xFF0000FF;
 
@@ -99,11 +99,11 @@ $app->add_show_handler(
         # Reset colors
         $_->{color} = 0xFFFFFFFF for @objects;
 
-        $app->update();
+        $app->update;
     }
 );
 
-$app->run();
+$app->run;
 
 sub make_object {
     my $x = rand $width;
@@ -130,7 +130,7 @@ sub make_object {
 
 sub make_body {
     my (%args) = @_;
-    my $bodyDef = Box2D::b2BodyDef->new();
+    my $bodyDef = Box2D::b2BodyDef->new;
     $bodyDef->position->Set( @args{qw( x y )} );
     $bodyDef->type(Box2D::b2_dynamicBody);
     $bodyDef->angle( rand pi );
@@ -140,7 +140,7 @@ sub make_body {
 sub make_polygon {
     my (%args) = @_;
     my ( $w, $h ) = @args{qw( w h )};
-    my $shape = Box2D::b2PolygonShape->new();
+    my $shape = Box2D::b2PolygonShape->new;
     $shape->SetAsBox( $w / 2.0, $h / 2.0 );
     return $shape;
 }

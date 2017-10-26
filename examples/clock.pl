@@ -95,7 +95,7 @@ my $ticks   = SDL::get_ticks();
 $app->add_show_handler(
     sub {
         $world->Step( $timestep, $vIters, $pIters );
-        $world->ClearForces();
+        $world->ClearForces;
 
         # clear surface
         $app->draw_rect( undef, 0x000000FF );
@@ -114,13 +114,13 @@ $app->add_show_handler(
         $app->draw_gfx_text( [ 10, 10 ],
             0xFFFFFFFF, sprintf( "FPS: %0.2f", $realFps ) );
 
-        $app->update();
+        $app->update;
 
         $frames++;
     }
 );
 
-$app->run();
+$app->run;
 
 # screen to world
 sub s2w { return $_[0] * $mpp }
@@ -131,11 +131,11 @@ sub w2s { return $_[0] * $ppm }
 sub make_static_circle {
     my ( $x, $y, $r ) = @_;
 
-    my $bodyDef = Box2D::b2BodyDef->new();
+    my $bodyDef = Box2D::b2BodyDef->new;
     $bodyDef->position->Set( $x, $y );
     my $body = $world->CreateBody($bodyDef);
 
-    my $circle = Box2D::b2CircleShape->new();
+    my $circle = Box2D::b2CircleShape->new;
     $circle->m_radius($r);
 
     $body->CreateFixture( $circle, 0.0 );
@@ -146,15 +146,15 @@ sub make_static_circle {
 sub make_dynamic_rect {
     my ( $x, $y, $w, $h ) = @_;
 
-    my $bodyDef = Box2D::b2BodyDef->new();
+    my $bodyDef = Box2D::b2BodyDef->new;
     $bodyDef->type(Box2D::b2_dynamicBody);
     $bodyDef->position->Set( $x + $w / 2, $y + $h / 2 );
     my $body = $world->CreateBody($bodyDef);
 
-    my $rect = Box2D::b2PolygonShape->new();
+    my $rect = Box2D::b2PolygonShape->new;
     $rect->SetAsBox( $w / 2, $h / 2 );
 
-    my $fixtureDef = Box2D::b2FixtureDef->new();
+    my $fixtureDef = Box2D::b2FixtureDef->new;
     $fixtureDef->shape($rect);
     $fixtureDef->density(1.0);
     $fixtureDef->friction(0.1);
@@ -170,7 +170,7 @@ sub make_dynamic_rect {
 
 sub make_revolute_joint {
     my ( $bodyA, $bodyB, $anchor, $speed, $torque ) = @_;
-    my $jointDef = Box2D::b2RevoluteJointDef->new();
+    my $jointDef = Box2D::b2RevoluteJointDef->new;
     $jointDef->Initialize( $bodyA, $bodyB, $anchor );
     $jointDef->enableMotor(1);
     $jointDef->motorSpeed($speed);
@@ -191,7 +191,7 @@ sub draw_clock_face {
 
 sub draw_circle {
     my ($circle) = @_;
-    my $p = $circle->{body}->GetPosition();
+    my $p = $circle->{body}->GetPosition;
     my ( $x, $y ) = ( $p->x, $p->y );
     $y = s2w($height) - $y;
     my ( $r, $c ) = @$circle{qw( radius color )};
