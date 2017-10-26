@@ -14,6 +14,7 @@ b2CircleShape *        O_OBJECT
 b2ContactListener *    O_OBJECT
 b2Contact *            O_OBJECT
 b2ContactImpulse *     O_OBJECT
+b2DistanceProxy *      O_OBJECT
 b2DistanceJoint *      O_OBJECT
 b2DistanceJointDef *   O_OBJECT
 b2Draw *               O_OBJECT

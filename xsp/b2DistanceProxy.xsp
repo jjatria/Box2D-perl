@@ -1,0 +1,56 @@
+%{
+
+#include <Box2D/Box2D.h>
+#include <helper.h>
+
+%}
+
+%module{Box2D};
+
+%name{Box2D::b2DistanceProxy} class b2DistanceProxy
+{
+
+b2DistanceProxy();
+
+int32 GetVertexCount();
+
+%{
+
+void
+b2DistanceProxy::Set( shape, index )
+	b2Shape* shape
+	int32 index
+	CODE:
+		THIS->Set( shape, index );
+
+int32
+b2DistanceProxy::GetSupport( d )
+	b2Vec2* d
+	CODE:
+		RETVAL = THIS->GetSupport( *d );
+	OUTPUT:
+		RETVAL
+
+void*
+b2DistanceProxy::GetSupportVertex( d )
+	b2Vec2* d
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = (b2Vec2*) &(THIS->GetSupportVertex( *d ));
+	OUTPUT:
+		RETVAL
+
+void*
+b2DistanceProxy::GetVertex( index )
+	int32 index
+	PREINIT:
+		const char* CLASS = "Box2D::b2Vec2";
+	CODE:
+		RETVAL = (b2Vec2*) &(THIS->GetVertex( index ));
+	OUTPUT:
+		RETVAL
+
+%}
+
+};
