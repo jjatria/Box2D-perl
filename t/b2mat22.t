@@ -1,76 +1,67 @@
 use strict;
 use warnings;
 use Box2D;
-use Test::More;
+use Test2::V0;
 
-my ( $a11, $a12, $a21, $a22 ) = ( 1.0, 2.0, 3.0, 4.0 );
-my ( $b11, $b12, $b21, $b22 ) = ( 5.0, 6.0, 7.0, 8.0 );
+use lib 't/lib';
+use MyTest::Helper qw( b2vec2_cmp );
 
-my $exa = Box2D::b2Vec2->new( $a11, $a21 );
-my $eya = Box2D::b2Vec2->new( $a12, $a22 );
-my $exb = Box2D::b2Vec2->new( $b11, $b21 );
-my $eyb = Box2D::b2Vec2->new( $b12, $b22 );
+my $exa = Box2D::b2Vec2->new( 1, 3 );
+my $eya = Box2D::b2Vec2->new( 2, 4 );
+my $exb = Box2D::b2Vec2->new( 5, 7 );
+my $eyb = Box2D::b2Vec2->new( 6, 8 );
 
-my $matrix = Box2D::b2Mat22->new( $a11, $a12, $a21, $a22 );
+my $zero  = Box2D::b2Vec2->new( 0, 0 );
 
-isa_ok( $matrix, "Box2D::b2Mat22" );
+my $matrix = Box2D::b2Mat22->new( $exa->x, $eya->x, $exa->y, $eya->y );
 
-is( $matrix->ex->x, $a11, "Get ex->x" );
-is( $matrix->ey->x, $a12, "Get ey->x" );
-is( $matrix->ex->y, $a21, "Get ex->y" );
-is( $matrix->ey->y, $a22, "Get ey->y" );
+isa_ok $matrix, 'Box2D::b2Mat22';
+ok my_check( $matrix, $exa, $eya), 'Set';
 
 $matrix->Set( $exb, $eyb );
+ok my_check( $matrix, $exb, $eyb), 'Set';
 
-is( $matrix->ex->x, $b11, "Set a11" );
-is( $matrix->ey->x, $b12, "Set a12" );
-is( $matrix->ex->y, $b21, "Set a21" );
-is( $matrix->ey->y, $b22, "Set a22" );
+$matrix->SetIdentity;
 
-$matrix->SetIdentity();
+my $horiz = Box2D::b2Vec2->new( 1, 0 );
+my $vert  = Box2D::b2Vec2->new( 0, 1 );
+ok my_check( $matrix, $horiz, $vert), 'SetIdentity';
 
-is( $matrix->ex->x, 1, "SetIdentity a11" );
-is( $matrix->ey->x, 0, "SetIdentity a12" );
-is( $matrix->ex->y, 0, "SetIdentity a21" );
-is( $matrix->ey->y, 1, "SetIdentity a22" );
+$matrix = Box2D::b2Mat22->new;
+isa_ok $matrix, 'Box2D::b2Mat22';
 
-$matrix = Box2D::b2Mat22->new();
-
-isa_ok( $matrix, "Box2D::b2Mat22" );
-
-$matrix->SetZero();
-
-is( $matrix->ex->x, 0, "SetZero a11" );
-is( $matrix->ey->x, 0, "SetZero a12" );
-is( $matrix->ex->y, 0, "SetZero a21" );
-is( $matrix->ey->y, 0, "SetZero a22" );
+$matrix->SetZero;
+ok my_check( $matrix, $zero, $zero), 'SetZero';
 
 $matrix->ex($exb);
 $matrix->ey($eyb);
 
-is( $matrix->ex->x, $b11, "ex x" );
-is( $matrix->ey->x, $b12, "ey x" );
-is( $matrix->ex->y, $b21, "ex y" );
-is( $matrix->ey->y, $b22, "ey y" );
+ok my_check( $matrix, $exb, $eyb), 'ey and ex as mutators';
 
 $matrix = Box2D::b2Mat22->new( $eyb, $exa );
+isa_ok( $matrix, 'Box2D::b2Mat22' );
+ok my_check( $matrix, $eyb, $exa), 'Arguments to constructor';
 
-isa_ok( $matrix, "Box2D::b2Mat22" );
+ok my_check(
+    Box2D::b2Mul($matrix, $matrix->GetInverse), $horiz, $vert
+), 'GetInverse';
 
-is( $matrix->ex->x, $b12, "new v2, v2 a11" );
-is( $matrix->ey->x, $a11, "new v2, v2 a12" );
-is( $matrix->ex->y, $b22, "new v2, v2 a21" );
-is( $matrix->ey->y, $a21, "new v2, v2 a22" );
-
-# TODO: GetInverse()
-
+$matrix = Box2D::b2Mat22->new( $eyb, $exa );
 {
-	# Solve for x: A * x = b, where b is a column vector arg
-	my $A = $matrix;
-	my $b = Box2D::b2Mul($A, $exa);
-	my $x = $A->Solve( $b );
-	cmp_ok( abs($x->x - $exa->x), "<=", 1e-5, "Solve" );
-	cmp_ok( abs($x->y - $exa->y), "<=", 1e-5, "Solve" );
+    # Solve for x: A * x = b, where b is a column vector arg
+    my $A = $matrix;
+    my $x = $A->Solve( $exa );
+    my $b = Box2D::b2Mul($A, $x );
+
+    ok b2vec2_cmp( $b, $exa ), 'Solve';
+}
+
+sub my_check {
+    my ($m, $a, $b, $msg) = @_;
+    foreach ( [ $m->ex, $a ], [ $m->ey, $b ] ) {
+      return 0 unless b2vec2_cmp( @{$_} );
+    }
+    return 1;
 }
 
 done_testing;

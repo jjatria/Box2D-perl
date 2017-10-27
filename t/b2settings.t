@@ -3,59 +3,56 @@ use warnings;
 use Box2D;
 use Test::More;
 
-cmp_ok( Box2D::b2_maxFloat,                  '>',  1e+37,            "Box2D::b2_maxFloat > 1e+37" );
-cmp_ok( Box2D::b2_epsilon,                   '<=', 1e-5,             "Box2D::b2_maxFloat <= 1e-5" );
+sub is_nearly {
+  my ($a, $b, $name, $threshold) = @_;
+  cmp_ok abs($a - $b), q{<=}, $threshold // 1e-5, "Box2d::b2_$name is nearly $b";
+}
 
-my $b2_pi = Box2D::b2_pi;
-_is_nearly( $b2_pi,                          3.14159265359,          "Box2D::b2_pi" );
-_is_nearly( Box2D::b2_maxManifoldPoints,     2,                      "Box2D::b2_maxManifoldPoints" );
-_is_nearly( Box2D::b2_maxPolygonVertices,    8,                      "Box2D::b2_maxPolygonVertices" );
-_is_nearly( Box2D::b2_aabbExtension,         0.1,                    "Box2D::b2_aabbExtension" );
-_is_nearly( Box2D::b2_aabbMultiplier,        2.0,                    "Box2D::b2_aabbMultiplier" );
+cmp_ok Box2D::b2_maxFloat, q{>},  1e+37, q{Box2D::b2_maxFloat > 1e+37};
+cmp_ok Box2D::b2_epsilon,  q{<=}, 1e-5,  q{Box2D::b2_maxFloat <= 1e-5};
 
-my $b2_lS = Box2D::b2_linearSlop;
-_is_nearly( $b2_lS,                          0.005,                  "Box2D::b2_linearSlop" );
-_is_nearly( Box2D::b2_angularSlop,           2.0 / 180.0 * $b2_pi,   "Box2D::b2_angularSlop" );
-_is_nearly( Box2D::b2_polygonRadius,         2.0 * $b2_lS,           "Box2D::b2_polygonRadius" );
-_is_nearly( Box2D::b2_maxSubSteps,           8,                      "Box2D::b2_maxSubSteps" );
-_is_nearly( Box2D::b2_maxTOIContacts,        32,                     "Box2D::b2_maxTOIContacts" );
-_is_nearly( Box2D::b2_velocityThreshold,     1.0,                    "Box2D::b2_velocityThreshold" );
-_is_nearly( Box2D::b2_maxLinearCorrection,   0.2,                    "Box2D::b2_maxLinearCorrection" );
-_is_nearly( Box2D::b2_maxAngularCorrection,  8.0 / 180.0 * $b2_pi,   "Box2D::b2_maxAngularCorrection" );
+my $pi = Box2D::b2_pi;
+my $lS = Box2D::b2_linearSlop;
+my $mT = Box2D::b2_maxTranslation;
+my $mR = Box2D::b2_maxRotation;
+my $v  = Box2D::b2_version;
 
-my $b2_mT = Box2D::b2_maxTranslation;
-_is_nearly( $b2_mT,                          2.0,                    "Box2D::b2_maxTranslation" );
-_is_nearly( Box2D::b2_maxTranslationSquared, $b2_mT * $b2_mT,        "Box2D::b2_maxTranslationSquared" );
+is_nearly $pi,                             3.14159265359, 'pi';
+is_nearly $lS,                             0.005,         'linearSlop';
+is_nearly $mT,                             2,             'maxTranslation';
+is_nearly $mR,                             0.5 * $pi,     'maxRotation';
 
-my $b2_mR = Box2D::b2_maxRotation;
-_is_nearly( $b2_mR,                          0.5 * $b2_pi,           "Box2D::b2_maxRotation" );
-_is_nearly( Box2D::b2_maxRotationSquared,    $b2_mR * $b2_mR,        "Box2D::b2_maxRotationSquared" );
-_is_nearly( Box2D::b2_baumgarte,             0.2,                    "Box2D::b2_baumgarte" );
-_is_nearly( Box2D::b2_toiBaugarte,           0.75,                   "Box2D::b2_toiBaugarte" );
-_is_nearly( Box2D::b2_timeToSleep,           0.5,                    "Box2D::b2_timeToSleep" );
-_is_nearly( Box2D::b2_linearSleepTolerance,  0.01,                   "Box2D::b2_linearSleepTolerance" );
-_is_nearly( Box2D::b2_angularSleepTolerance, (2.0 / 180.0 * $b2_pi), "Box2D::b2_angularSleepTolerance" );
+is_nearly Box2D::b2_maxManifoldPoints,     2,             'maxManifoldPoints';
+is_nearly Box2D::b2_maxPolygonVertices,    8,             'maxPolygonVertices';
+is_nearly Box2D::b2_aabbExtension,         0.1,           'aabbExtension';
+is_nearly Box2D::b2_aabbMultiplier,        2,             'aabbMultiplier';
+is_nearly Box2D::b2_angularSlop,           2 / 180 * $pi, 'angularSlop';
+is_nearly Box2D::b2_polygonRadius,         2 * $lS,       'polygonRadius';
+is_nearly Box2D::b2_maxSubSteps,           8,             'maxSubSteps';
+is_nearly Box2D::b2_maxTOIContacts,        32,            'maxTOIContacts';
+is_nearly Box2D::b2_velocityThreshold,     1,             'velocityThreshold';
+is_nearly Box2D::b2_maxLinearCorrection,   0.2,           'maxLinearCorrection';
+is_nearly Box2D::b2_maxAngularCorrection,  8 / 180 * $pi, 'maxAngularCorrection';
+is_nearly Box2D::b2_maxTranslationSquared, $mT * $mT,     'maxTranslationSquared';
+is_nearly Box2D::b2_maxRotationSquared,    $mR * $mR,     'maxRotationSquared';
+is_nearly Box2D::b2_baumgarte,             0.2,           'baumgarte';
+is_nearly Box2D::b2_toiBaugarte,           0.75,          'toiBaugarte';
+is_nearly Box2D::b2_timeToSleep,           0.5,           'timeToSleep';
+is_nearly Box2D::b2_linearSleepTolerance,  0.01,          'linearSleepTolerance';
+is_nearly Box2D::b2_angularSleepTolerance, 2 / 180 * $pi, 'angularSleepTolerance';
 
 # TODO: Memory Allocation
 # void* b2Alloc(int32 size);
 # void b2Free(void* mem);
 # void b2Log(const char* string, ...);
 
-my $version = Box2D::b2_version();
-isa_ok( $version,                                                    "Box2D::b2Version", "Box2D::b2_version()" );
-like( $version->major,                       qr/^\d+$/,              "version->major is a number" );
-like( $version->minor,                       qr/^\d+$/,              "version->minor is a number" );
-like( $version->revision,                    qr/^\d+$/,              "version->revision is a number" );
-isnt( $version,                              Box2D::b2_version(),    "b2_version returns different objects" );
-diag( sprintf("Version: %s.%s.%s", $version->major, $version->minor, $version->revision) );
+isa_ok $v, 'Box2D::b2Version', 'Box2D::b2_version';
 
-pass("cleanup");
+like $v->major,    qr/^\d+$/,         'version->major is a number';
+like $v->minor,    qr/^\d+$/,         'version->minor is a number';
+like $v->revision, qr/^\d+$/,         'version->revision is a number';
+isnt $v,           Box2D::b2_version, 'b2_version returns different objects';
+
+note sprintf('Version: %s.%s.%s', $v->major, $v->minor, $v->revision);
 
 done_testing;
-
-sub _is_nearly {
-    my ($a, $b, $c) = @_;
-    $a              = int($a * 1000000 + 0.5) / 1000000;
-    $b              = int($b * 1000000 + 0.5) / 1000000;
-    is( $a, $b, "$c is nearly $b" );
-}

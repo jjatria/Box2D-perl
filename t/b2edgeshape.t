@@ -3,10 +3,12 @@ use warnings;
 use Box2D;
 use Test::More;
 
-my $edge = Box2D::b2EdgeShape->new();
-ok( $edge, 'new' );
-isa_ok( $edge, 'Box2D::b2EdgeShape' );
+use lib 't/lib';
+use MyTest::Helper qw( b2vec2_cmp );
 
+my $edge = Box2D::b2EdgeShape->new;
+ok $edge, 'new';
+isa_ok $edge, 'Box2D::b2EdgeShape';
 
 my $v0 = Box2D::b2Vec2->new( 0.0, 0.0 );
 my $v1 = Box2D::b2Vec2->new( 1.0, 0.0 );
@@ -16,12 +18,24 @@ my $v3 = Box2D::b2Vec2->new( 1.0, 2.0 );
 $edge->Set( $v1, $v2 );
 pass('Set');
 
-is( $edge->m_vertex1->x, $v1->x, 'm_vertex1 x' );
-is( $edge->m_vertex1->y, $v1->y, 'm_vertex1 y' );
-is( $edge->m_vertex2->x, $v2->x, 'm_vertex2 x' );
-is( $edge->m_vertex2->y, $v2->y, 'm_vertex2 y' );
-ok( ! $edge->m_hasVertex0, 'm_hasVertex0' );
-ok( ! $edge->m_hasVertex3, 'm_hasVertex3' );
+is  $edge->GetChildCount, 1, 'GetChildCount';
+
+ok b2vec2_cmp( $edge->m_vertex1, $v1), 'm_vertex1';
+ok b2vec2_cmp( $edge->m_vertex2, $v2), 'm_vertex2';
+
+ok !$edge->m_hasVertex0,         'm_hasVertex0';
+ok !$edge->m_hasVertex3,         'm_hasVertex3';
+
+ok !$edge->TestPoint( Box2D::b2Transform->new, $v1 ), 'TestPoint always returns false';
+ok !$edge->TestPoint( Box2D::b2Transform->new, $v3 ), 'TestPoint always returns false';
+
+my $mass = Box2D::b2MassData->new;
+$edge->ComputeMass( $mass, 0 ); # Density is ignored
+
+my $center = ($v1 + $v2) * 0.5;
+ok b2vec2_cmp( $mass->center, $center), 'mass->center';
+is $mass->mass, 0,                      'mass->mass';
+is $mass->I,    0,                      'mass->I';
 
 $edge->m_vertex0( $v0 );
 $edge->m_hasVertex0(1);
@@ -29,17 +43,16 @@ $edge->m_hasVertex0(1);
 $edge->m_vertex3( $v3 );
 $edge->m_hasVertex3(1);
 
-ok( $edge->m_hasVertex0, 'm_hasVertex0' );
-is( $edge->m_vertex0->x, $v0->x, 'm_vertex0 x' );
-is( $edge->m_vertex0->y, $v0->y, 'm_vertex0 y' );
+ok $edge->m_hasVertex0,                'm_hasVertex0';
+ok b2vec2_cmp( $edge->m_vertex0, $v0), 'm_vertex0';
 
-ok( $edge->m_hasVertex3, 'm_hasVertex3' );
-is( $edge->m_vertex3->x, $v3->x, 'm_vertex3 x' );
-is( $edge->m_vertex3->y, $v3->y, 'm_vertex3 y' );
+ok $edge->m_hasVertex3,                'm_hasVertex3';
+ok b2vec2_cmp( $edge->m_vertex3, $v3), 'm_vertex3';
 
 $edge->m_hasVertex0(0);
 $edge->m_hasVertex3(0);
-ok( !$edge->m_hasVertex0, 'm_hasVertex0 false' );
-ok( !$edge->m_hasVertex3, 'm_hasVertex3 false' );
+
+ok !$edge->m_hasVertex0, 'm_hasVertex0 false';
+ok !$edge->m_hasVertex3, 'm_hasVertex3 false';
 
 done_testing;

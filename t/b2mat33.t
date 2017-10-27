@@ -2,86 +2,152 @@ use strict;
 use warnings;
 use Box2D;
 use Test::More;
+use Class::Load qw( try_load_class );
 
-my ( $a11, $a21, $a31, $a12, $a22, $a32, $a13, $a23, $a33 ) = ( 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0 );
-my ( $b11, $b21, $b31, $b12, $b22, $b32, $b13, $b23, $b33 ) = ( 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0, 17.0, 18.0 );
+use lib 't/lib';
+use MyTest::Helper qw(
+  b2mat22_cmp b2mat33_cmp b2vec2_cmp b2vec3_cmp
+);
 
-my $exa = Box2D::b2Vec3->new( $a11, $a21, $a31 );
-my $eya = Box2D::b2Vec3->new( $a12, $a22, $a32 );
-my $eza = Box2D::b2Vec3->new( $a13, $a23, $a33 );
-my $exb = Box2D::b2Vec3->new( $b11, $b21, $b31 );
-my $eyb = Box2D::b2Vec3->new( $b12, $b22, $b32 );
-my $ezb = Box2D::b2Vec3->new( $b13, $b23, $b33 );
+my $zero = Box2D::b2Vec2_zero;
 
-my $matrix = Box2D::b2Mat33->new( $exa, $eya, $eza );
+my %singular = (
+  ex => Box2D::b2Vec3->new(  0,  0,  0 ),
+  ey => Box2D::b2Vec3->new(  1,  1,  1 ),
+  ez => Box2D::b2Vec3->new(  0,  0,  0 ),
+);
 
+my %invertible = (
+  ex => Box2D::b2Vec3->new(  1,  7,  3 ),
+  ey => Box2D::b2Vec3->new(  7,  4, -5 ),
+  ez => Box2D::b2Vec3->new(  3, -5,  6 ),
+);
+
+my @cols = qw( ex ey ez );
+
+my $matrix = Box2D::b2Mat33->new( @invertible{@cols} );
 isa_ok( $matrix, "Box2D::b2Mat33" );
+ok check( $matrix, @invertible{@cols} ), 'Arguments to constructor';
 
-is( $matrix->ex->x, $a11, "new a11" );
-is( $matrix->ey->x, $a12, "new a12" );
-is( $matrix->ez->x, $a13, "new a13" );
-is( $matrix->ex->y, $a21, "new a21" );
-is( $matrix->ey->y, $a22, "new a22" );
-is( $matrix->ez->y, $a23, "new a23" );
-is( $matrix->ex->z, $a31, "new a31" );
-is( $matrix->ey->z, $a32, "new a32" );
-is( $matrix->ez->z, $a33, "new a33" );
+$matrix->SetZero;
+ok check( $matrix, $zero, $zero, $zero), 'SetZero';
 
-$matrix->SetZero();
+$matrix = Box2D::b2Mat33->new;
+isa_ok $matrix, 'Box2D::b2Mat33';
 
-is( $matrix->ex->x, 0, "SetZero a11" );
-is( $matrix->ey->x, 0, "SetZero a12" );
-is( $matrix->ez->x, 0, "SetZero a13" );
-is( $matrix->ex->y, 0, "SetZero a21" );
-is( $matrix->ey->y, 0, "SetZero a22" );
-is( $matrix->ez->y, 0, "SetZero a23" );
-is( $matrix->ex->z, 0, "SetZero a31" );
-is( $matrix->ey->z, 0, "SetZero a32" );
-is( $matrix->ez->z, 0, "SetZero a33" );
+$matrix->$_( $invertible{$_} ) foreach @cols;
 
-$matrix = Box2D::b2Mat33->new();
+ok check( $matrix, @invertible{@cols} ), 'ex, ey, and ez as mutators';
 
-isa_ok( $matrix, "Box2D::b2Mat33" );
+{
+    # Solve for x: A * x = b, where b is a column vector arg
 
-$matrix->ex($exb);
-$matrix->ey($eyb);
-$matrix->ez($ezb);
+    my $A = Box2D::b2Mat33->new( @invertible{@cols} );
+    my $ex = $singular{ex};
 
-is( $matrix->ex->x, $b11, "ex a11" );
-is( $matrix->ey->x, $b12, "ey a12" );
-is( $matrix->ez->x, $b13, "ez a13" );
-is( $matrix->ex->y, $b21, "ex a21" );
-is( $matrix->ey->y, $b22, "ey a22" );
-is( $matrix->ez->y, $b23, "ez a23" );
-is( $matrix->ex->z, $b31, "ex a31" );
-is( $matrix->ey->z, $b32, "ey a32" );
-is( $matrix->ez->z, $b33, "ez a33" );
+    my $x = $A->Solve33( $ex );
+    my $b = Box2D::b2Mul( $A, $x );
 
-
-TODO: {
-	local $TODO = "I think this test is right. Is it possible that b2Math.c is wrong?";
-	# Solve for x: A * x = b, where b is a column vector arg
-	my $A = $matrix;
-	my $b = Box2D::b2Mul($A, $exa);
-	my $x = $A->Solve33( $b );
-	cmp_ok( abs($x->x - $exa->x), "<=", 1e-5, "Solve33" );
-	cmp_ok( abs($x->y - $exa->y), "<=", 1e-5, "Solve33" );
-	cmp_ok( abs($x->z - $exa->z), "<=", 1e-5, "Solve33" );
+    ok b2vec3_cmp( $b, $ex ), 'Solve33';
 }
 
 {
-	# Solve for x: A * x = b, where b is a column vector arg
-	# Solve only the upper 2-by-2 matrix equation
-	my $A = $matrix;
-	my $ex = Box2D::b2Vec2->new(3, -5);
-	my $b = Box2D::b2Mul22($A, $ex);
-	my $x = $A->Solve22( $b );
-	cmp_ok( abs($x->x - $ex->x), "<=", 1e-5, "Solve22" );
-	cmp_ok( abs($x->y - $ex->y), "<=", 1e-5, "Solve22" );
+    # Solve for x: A * x = b, where b is a column vector arg
+    # Solve only the upper 2-by-2 matrix equation
+
+    my $A = Box2D::b2Mat33->new( @invertible{@cols} );
+    my $ex = Box2D::b2Vec2->new(3, -5);
+
+    my $x = $A->Solve22( $ex );
+    my $b = Box2D::b2Mul22( $A, $x );
+
+    ok b2vec2_cmp( $b, $ex ), 'Solve22';
 }
 
-# TODO: GetInverse22( M )
+foreach (
+        [ singular   => \%singular   ],
+        [ invertible => \%invertible ],
+    ) {
 
-# TODO: GetSymInverse33( M )
+    my ($name, $values) = @{$_};
+    my $matrix = Box2D::b2Mat33->new( @{$values}{@cols} );
+
+    my $test = Box2D::b2Mat33->new;
+    $matrix->GetInverse22( $test );
+
+    my $check = Box2D::b2Mat22->new(
+      $matrix->ex->x, $matrix->ey->x,
+      $matrix->ex->y, $matrix->ey->y,
+    )->GetInverse;
+
+    ok b2mat22_cmp( $test, $check), "GetInverse22 when $name";
+}
+
+{
+    # This is a singular matrix
+    my $matrix = Box2D::b2Mat33->new( @singular{@cols} );
+
+    my $test = Box2D::b2Mat33->new;
+    $matrix->GetSymInverse33( $test );
+
+    my $check = Box2D::b2Mat33->new;
+    $check->SetZero;
+
+    ok b2mat33_cmp( $test, $check), 'GetSymInverse33 when singular';
+}
+
+SKIP: {
+    skip 'Matrix inversion test requires Math::Matrix', 9
+      unless try_load_class 'Math::Matrix';
+
+    # This is not a singular matrix
+    my $matrix = Box2D::b2Mat33->new( @invertible{@cols} );
+
+    my $test = Box2D::b2Mat33->new;
+    $matrix->GetSymInverse33( $test );
+
+    my $check = to_box2d (
+        Math::Matrix->new(
+            [ map { $matrix->ex->$_ } qw( x y z ) ],
+            [ map { $matrix->ey->$_ } qw( x y z ) ],
+            [ map { $matrix->ez->$_ } qw( x y z ) ],
+        )->invert
+    );
+
+    ok b2mat33_cmp( $test, $check), 'GetSymInverse33 when invertible';
+}
+
+sub check {
+    my ($m, $a, $b, $c) = @_;
+
+    if (ref $m eq 'Box2D::b2Mat22') {
+        foreach (
+                [ $m->ex, $a ],
+                [ $m->ey, $b ],
+            ) {
+            return 0 unless b2vec2_cmp( @{$_} );
+        }
+    }
+    else {
+        foreach (
+                [ $m->ex, $a ],
+                [ $m->ey, $b ],
+                [ $m->ez, $c ],
+            ) {
+
+            return 0 unless b2vec2_cmp( @{$_} );
+        }
+    }
+
+    return 1;
+}
+
+sub to_box2d {
+  return Box2D::b2Mat33->new(
+    map {
+      Box2D::b2Vec3->new( @{ $_[0]->slice($_)->transpose->[0] } )
+    } (0 .. 2)
+  );
+}
 
 done_testing;
