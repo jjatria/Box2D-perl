@@ -151,12 +151,8 @@ sub make_static_circle {
 
     my $bodyDef = Box2D::b2BodyDef->new;
     $bodyDef->position->Set( $x, $y );
-    my $body = $world->CreateBody($bodyDef);
 
-    my $circle = Box2D::b2CircleShape->new;
-    $circle->m_radius($r);
-
-    return $body;
+    return $world->CreateBody($bodyDef);
 }
 
 sub make_dynamic_circle {
@@ -164,14 +160,9 @@ sub make_dynamic_circle {
 
     my $bodyDef = Box2D::b2BodyDef->new;
     $bodyDef->type(Box2D::b2_dynamicBody);
-
     $bodyDef->position->Set( $x, $y );
-    my $body = $world->CreateBody($bodyDef);
 
-    my $dynamicCircle = Box2D::b2CircleShape->new;
-    $dynamicCircle->m_radius($r);
-
-    return $body;
+    return $world->CreateBody($bodyDef);
 }
 
 sub draw_circle {
