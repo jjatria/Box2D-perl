@@ -26,7 +26,6 @@ b2Mat33::new( ... )
 	OUTPUT:
 		RETVAL
 
-
 void*
 b2Mat33::Solve33( b )
 	b2Vec3* b
@@ -36,7 +35,7 @@ b2Mat33::Solve33( b )
 		RETVAL = new b2Vec3(THIS->Solve33(*b));
 	OUTPUT:
 		RETVAL
-		
+
 void*
 b2Mat33::Solve22( b )
 	b2Vec2* b
@@ -46,13 +45,13 @@ b2Mat33::Solve22( b )
 		RETVAL = new b2Vec2(THIS->Solve22(*b));
 	OUTPUT:
 		RETVAL
-		
+
 void
 b2Mat33::GetInverse22( M )
 	b2Mat33* M
 	CODE:
 		THIS->GetInverse22(M);
-		
+
 void
 b2Mat33::GetSymInverse33( M )
 	b2Mat33* M
@@ -84,7 +83,7 @@ b2Mat33::ey( ... )
 		RETVAL = &(THIS->ey);
 	OUTPUT:
 		RETVAL
-		
+
 void*
 b2Mat33::ez( ... )
 	PREINIT:
