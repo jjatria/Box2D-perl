@@ -431,14 +431,14 @@ note 'b2Min / b2Max';
     ok b2vec2_cmp( $test, $check ), 'b2Clamp(b2Vec2)';
 }
 
-todo 'Dunno how to get the xsp to work' => sub {
-    my $a = 123;
+{
+    my $a = \123;
     my $b = \456;
     Box2D::b2Swap( $a, $b );
 
-    is ${$a}, 456, 'b2Swap';
-    is   $b,  123, 'b2Swap';
-};
+    is ${$a}, 456, 'b2Swap a';
+    is ${$b}, 123, 'b2Swap b';
+}
 
 is  Box2D::b2NextPowerOfTwo(2), 2 ** 2, 'b2NextPowerOfTwo';
 
